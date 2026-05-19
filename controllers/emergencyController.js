@@ -229,8 +229,8 @@ const acceptRequest = async (req, res) => {
   const { request_id, responder_lat, responder_lng } = req.body;
   const responder_id = req.user.id; // Correct: Use the ID from the authenticated token
 
-  if (!request_id || !responder_lat || !responder_lng) {
-    return res.status(400).json({ message: 'Missing required location data' });
+  if (!request_id) {
+    return res.status(400).json({ message: 'Missing required request id' });
   }
 
   try {
@@ -238,8 +238,8 @@ const acceptRequest = async (req, res) => {
     const affectedRows = await Emergency.claim(
       request_id, 
       responder_id, 
-      responder_lat, 
-      responder_lng
+      responder_lat ?? null, 
+      responder_lng ?? null
     );
 
     if (affectedRows === 0) {

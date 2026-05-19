@@ -3,38 +3,6 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const User = userModel; // fix: User is used below
 
-const getAuthErrorPayload = (error, fallbackMessage) => {
-  const message = error?.message || "";
-  const code = error?.code || "";
-
-  if (message.includes("secretOrPrivateKey must have a value")) {
-    return {
-      message: fallbackMessage,
-      hint: "JWT_SECRET is missing on backend environment"
-    };
-  }
-
-  if (
-    code === "ECONNREFUSED" ||
-    code === "ENOTFOUND" ||
-    code === "ER_ACCESS_DENIED_ERROR" ||
-    code === "ER_BAD_DB_ERROR" ||
-    code === "PROTOCOL_CONNECTION_LOST" ||
-    message.toLowerCase().includes("connect")
-  ) {
-    return {
-      message: fallbackMessage,
-      hint: "Database connection/config issue on deployed backend",
-      dbErrorCode: code || undefined
-    };
-  }
-
-  return {
-    message: fallbackMessage,
-    errorCode: code || undefined
-  };
-};
-
 // Generate JWT
 const generateToken = (user) => {
   return jwt.sign(
@@ -90,7 +58,7 @@ const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("registerUser error:", error);
-    return res.status(500).json(getAuthErrorPayload(error, "Server error during registration"));
+    return res.status(500).json({ message: "Server error during registration" });
   }
 };
 
@@ -126,7 +94,7 @@ const loginUser = async (req, res) => {
     });
   } catch (err) {
     console.error("loginUser error:", err);
-    return res.status(500).json(getAuthErrorPayload(err, "Server error during login"));
+    return res.status(500).json({ message: "Server error during login" });
   }
 };
 
